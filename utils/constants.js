@@ -1,5 +1,6 @@
 export const WHITELIST_DOMAINS = [
     // them [domain];
+    'https://omni-fe-tcge.vercel.app',
     'http://localhost:3000',
 ];
 
