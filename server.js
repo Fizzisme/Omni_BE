@@ -45,8 +45,8 @@ const START_SERVER = async () => {
     // Middleware xử lý lỗi tập trung
     app.use(errorHandlingMiddleware);
 
-    const HOST = env.APP_HOST || 'localhost';
-    const PORT = env.APP_PORT || 8017;
+    const HOST = '0.0.0.0';
+    const PORT = process.env.PORT || 8017;
 
     app.get('/', (req, res) => {
         res.end('<h1>Hello World!</h1><hr>');
