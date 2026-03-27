@@ -1,0 +1,16 @@
+import 'dotenv/config';
+
+export const env = {
+    MONGODB_URI: process.env.MONGODB_URI,
+    DATABASE_NAME: process.env.DATABASE_NAME,
+    APP_PORT: process.env.APP_PORT,
+    APP_HOST: process.env.APP_HOST,
+
+    ACCESS_TOKEN_SECRET_SIGNATURE: process.env.ACCESS_TOKEN_SECRET_SIGNATURE,
+    ACCESS_TOKEN_LIFE: process.env.ACCESS_TOKEN_LIFE,
+    REFRESH_TOKEN_SECRET_SIGNATURE: process.env.REFRESH_TOKEN_SECRET_SIGNATURE,
+    REFRESH_TOKEN_LIFE: process.env.REFRESH_TOKEN_LIFE,
+
+    MAIL_USER: process.env.MAIL_USER,
+    MAIL_PASS: process.env.MAIL_PASS,
+};
