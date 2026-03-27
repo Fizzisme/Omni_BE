@@ -5,6 +5,11 @@ import ApiError from "../utils/ApiError.js";
 import {StatusCodes} from "http-status-codes";
 import {JwtProvider} from "../providers/JwtProvider.js";
 import bcrypt from 'bcrypt';
+import {Resend} from "resend";
+
+
+
+const resend = new Resend(env.RESEND_API_KEY);
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -14,16 +19,59 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const sendVerifyCode = async (email) => {
+// const sendVerifyCode = async (email) => {
+//     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//
+//     const token = JwtProvider.generateToken(
+//         {email, otp},
+//         env.ACCESS_TOKEN_SECRET_SIGNATURE,
+//        '5m'
+//     )
+//     const mailOptions = {
+//         from: `"Omnicart" <${env.MAIL_USER}>`,
+//         to: email,
+//         subject: "Your Omnicart Verification Code",
+//         html: `
+//             <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
+//                 <h2 style="color: #e87722;">Welcome to Omnicart!</h2>
+//                 <p>Use the verification code below to complete your registration:</p>
+//                 <div style="
+//                     font-size: 36px;
+//                     font-weight: bold;
+//                     letter-spacing: 10px;
+//                     color: #e87722;
+//                     text-align: center;
+//                     padding: 20px;
+//                     background: #fff5ee;
+//                     border-radius: 8px;
+//                     margin: 24px 0;
+//                 ">
+//                     ${otp}
+//                 </div>
+//                 <p>This code will expire in <b>5 minutes</b> (at 5 minutes).</p>
+//                 <p style="color: #999; font-size: 13px;">
+//                     If you did not request this, please ignore this email.
+//                 </p>
+//             </div>
+//         `,
+//     };
+//
+//     await transporter.sendMail(mailOptions);
+//
+//
+//     return token
+// };
+export const sendVerifyCode = async (email) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     const token = JwtProvider.generateToken(
-        {email, otp},
+        { email, otp },
         env.ACCESS_TOKEN_SECRET_SIGNATURE,
-       '5m'
-    )
-    const mailOptions = {
-        from: `"Omnicart" <${env.MAIL_USER}>`,
+        '5m'
+    );
+
+    await resend.emails.send({
+        from: "Omnicart <onboarding@resend.dev>", // chưa có domain thì dùng cái này
         to: email,
         subject: "Your Omnicart Verification Code",
         html: `
@@ -43,20 +91,16 @@ const sendVerifyCode = async (email) => {
                 ">
                     ${otp}
                 </div>
-                <p>This code will expire in <b>5 minutes</b> (at 5 minutes).</p>
+                <p>This code will expire in <b>5 minutes</b>.</p>
                 <p style="color: #999; font-size: 13px;">
                     If you did not request this, please ignore this email.
                 </p>
             </div>
         `,
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
-
-
-    return token
+    return token;
 };
-
 const verifyCode = async (token,code) => {
     const {otp, email} = await JwtProvider.verifyToken(token, env.ACCESS_TOKEN_SECRET_SIGNATURE);
 

@@ -6,6 +6,9 @@ import {OrderModel, orderModel} from "../models/order.model.js";
 import {userModel} from "../models/user.model.js";
 import {env} from "../config/environment.js";
 import nodemailer from "nodemailer";
+import {Resend} from "resend";
+
+const resend = new Resend(env.RESEND_API_KEY);
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -14,9 +17,45 @@ const transporter = nodemailer.createTransport({
         pass: env.MAIL_PASS,
     },
 });
-const sendOrderSuccessEmail = async (email, order) => {
-    const mailOptions = {
-        from: `"Omnicart" <${env.MAIL_USER}>`,
+// const sendOrderSuccessEmail = async (email, order) => {
+//     const mailOptions = {
+//         from: `"Omnicart" <${env.MAIL_USER}>`,
+//         to: email,
+//         subject: "Order Confirmation - Omnicart",
+//         html: `
+//             <div style="font-family: Arial, sans-serif; max-width: 520px; margin: auto;">
+//                 <h2 style="color: #e87722;">Order Confirmed</h2>
+//
+//                 <p>Hi ${order.customer?.firstName || email},</p>
+//
+//                 <p>Your order has been successfully placed.</p>
+//
+//                 <div style="
+//                     background: #fff5ee;
+//                     padding: 16px;
+//                     border-radius: 8px;
+//                     margin: 20px 0;
+//                 ">
+//                     <p><b>OrderId:</b> #${order._id}</p>
+//                     <p><b>Total:</b> $${order.total}</p>
+//                     <p><b>Status:</b> ${order.status}</p>
+//                 </div>
+//
+//                 <p>We will process your order shortly.</p>
+//
+//                 <p style="color:#999; font-size: 13px;">
+//                     Thank you for shopping with Omnicart
+//                 </p>
+//             </div>
+//         `,
+//     };
+//
+//     await transporter.sendMail(mailOptions);
+// };
+
+export const sendOrderSuccessEmail = async (email, order) => {
+    await resend.emails.send({
+        from: "Omnicart <onboarding@resend.dev>", // chưa có domain thì dùng cái này
         to: email,
         subject: "Order Confirmation - Omnicart",
         html: `
@@ -45,16 +84,59 @@ const sendOrderSuccessEmail = async (email, order) => {
                 </p>
             </div>
         `,
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
 };
 
-const sendOrderStatusEmail = async (email, order, reason) => {
+
+// const sendOrderStatusEmail = async (email, order, reason) => {
+//     const isApproved = order.status === "APPROVE";
+//
+//     const mailOptions = {
+//         from: `"Omnicart" <${env.MAIL_USER}>`,
+//         to: email,
+//         subject: isApproved
+//             ? "✅ Order Approved - Omnicart"
+//             : "❌ Order Rejected - Omnicart",
+//
+//         html: `
+//             <div style="font-family: Arial; max-width: 520px; margin:auto;">
+//                 <h2 style="color:${isApproved ? "#22c55e" : "#ef4444"};">
+//                     ${isApproved ? "Order Approved 🎉" : "Order Rejected ⚠️"}
+//                 </h2>
+//
+//                 <p>Order ID: <b>${order._id}</b></p>
+//                 <p>Total: <b>$${order.total.toLocaleString()}</b></p>
+//
+//                 ${
+//             isApproved
+//                 ? `<p>Your order has been approved and is being processed.</p>`
+//                 : `
+//                         <p>Your order has been rejected due to potential fraud risk.</p>
+//                         <div style="
+//                             background:#fff1f2;
+//                             padding:12px;
+//                             border-radius:6px;
+//                             margin-top:10px;
+//                         ">
+//                             <b>Reason:</b> ${reason || "High risk detected by AI system"}
+//                         </div>
+//                     `
+//         }
+//
+//                 <p style="margin-top:20px; font-size:13px; color:#888;">
+//                     If you believe this is a mistake, please contact support.
+//                 </p>
+//             </div>
+//         `,
+//     };
+//
+//     await transporter.sendMail(mailOptions);
+// };
+export const sendOrderStatusEmail = async (email, order, reason) => {
     const isApproved = order.status === "APPROVE";
 
-    const mailOptions = {
-        from: `"Omnicart" <${env.MAIL_USER}>`,
+    await resend.emails.send({
+        from: "Omnicart <onboarding@resend.dev>",
         to: email,
         subject: isApproved
             ? "✅ Order Approved - Omnicart"
@@ -73,16 +155,16 @@ const sendOrderStatusEmail = async (email, order, reason) => {
             isApproved
                 ? `<p>Your order has been approved and is being processed.</p>`
                 : `
-                        <p>Your order has been rejected due to potential fraud risk.</p>
-                        <div style="
-                            background:#fff1f2;
-                            padding:12px;
-                            border-radius:6px;
-                            margin-top:10px;
-                        ">
-                            <b>Reason:</b> ${reason || "High risk detected by AI system"}
-                        </div>
-                    `
+                            <p>Your order has been rejected due to potential fraud risk.</p>
+                            <div style="
+                                background:#fff1f2;
+                                padding:12px;
+                                border-radius:6px;
+                                margin-top:10px;
+                            ">
+                                <b>Reason:</b> ${reason || "High risk detected by AI system"}
+                            </div>
+                        `
         }
 
                 <p style="margin-top:20px; font-size:13px; color:#888;">
@@ -90,9 +172,7 @@ const sendOrderStatusEmail = async (email, order, reason) => {
                 </p>
             </div>
         `,
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
 };
 const create = async (data) => {
 
@@ -170,7 +250,7 @@ const getById = async (id) => {
 const update = async (id,data) => {
     const order = await orderModel.getById(id);
     if(order.status !== 'PENDING') throw new ApiError(StatusCodes.BAD_REQUEST,"AI service error");
-    updatedOrder = await orderModel.update(id,data)
+    const updatedOrder = await orderModel.update(id,data)
     const user = await userModel.findById(order.userId);
     const emailToSend = user.authProviders[0].email;
     sendOrderStatusEmail(
