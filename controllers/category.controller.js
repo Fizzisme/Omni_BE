@@ -22,9 +22,18 @@ const getAll = async (req, res, next) => {
     }
 }
 
-
+const  getCategoryById = async (req, res, next) => {
+    try {
+        const result = await categoryService.getCategoryById(req.params.id);
+        res.status(StatusCodes.OK).json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+}
 
 export const categoryController = {
     getCategoriesBySlug,
-    getAll
+    getAll,
+    getCategoryById
 }

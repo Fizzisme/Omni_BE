@@ -14,7 +14,12 @@ const getAll = async () =>{
     return categories;
 }
 
+const getCategoryById = async (id) => {
+    return await categoryModel.findById(id);
+}
+
 export const categoryService = {
     getCategoriesBySlug,
-    getAll
+    getAll,
+    getCategoryById
 }
