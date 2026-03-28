@@ -11,6 +11,11 @@ const getProductsByCategory = async (categorySlug)=>{
     return products;
 }
 
+const getAll = async ()=>{
+    return await productModel.getAll()
+}
+
 export const productService = {
     getProductsByCategory,
+    getAll
 }

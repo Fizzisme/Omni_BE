@@ -35,6 +35,12 @@ const findByCategoryId = async (categoryId) => {
     return await ProductModel.find({categoryId});
 }
 
+const getAll = async () =>{
+    return await ProductModel.find();
+}
+
+
 export const productModel = {
     findByCategoryId,
+    getAll
 }

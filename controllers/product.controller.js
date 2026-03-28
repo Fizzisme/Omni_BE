@@ -12,7 +12,17 @@ const getProductsByCategory = async (req,res,next)=>{
     }
 }
 
+const getAll = async (req,res,next)=>{
+    try {
+        const result = await productService.getAll();
+        res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+        next(error);
+    }
+}
+
 
 export const productController = {
     getProductsByCategory,
+    getAll,
 }
