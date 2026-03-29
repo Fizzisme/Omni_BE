@@ -105,7 +105,7 @@ const getAll = async () => {
             }
         },
         {
-            $sort: { statusOrder: 1 }
+            $sort: { statusOrder: 1,createdAt: -1 }
         }
     ]);
 }
