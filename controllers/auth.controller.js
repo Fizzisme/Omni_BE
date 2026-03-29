@@ -57,16 +57,7 @@ console.log('hi')
 
 const signUp = async (req, res, next) => {
     try {
-        const token = req.cookies?.otp_token;
-        const { password } = req.body;
-
-        if (!token) {
-            return res.status(400).json({ message: "OTP token not found. Please request a new code." });
-        }
-        const result = await authService.signUp(token,password);
-
-        // Xóa cookie otp sau khi verify xong
-        res.clearCookie("otp_token");
+        const result = await authService.signUp(req.email,req.password);
         return res.status(StatusCodes.CREATED).json(result);
     }
     catch (err) {

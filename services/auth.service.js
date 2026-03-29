@@ -108,8 +108,7 @@ const verifyCode = async (token,code) => {
     return email;
 }
 
-const signUp = async (token,password) => {
-    const {otp, email} = await JwtProvider.verifyToken(token, env.ACCESS_TOKEN_SECRET_SIGNATURE);
+const signUp = async (email,password) => {
 
     const userExisted = await userModel.findByEmail(email);
     if(userExisted) throw new ApiError(StatusCodes.NOT_ACCEPTABLE, "Tài khoản đã tồn tại");
