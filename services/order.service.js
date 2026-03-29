@@ -229,7 +229,7 @@ const create = async (data) => {
             total: data.total,
             items: data.items,
             aiAnalyst: result,
-            status: result.risk === "HIGH" ? "PENDING" : "APPROVE"
+            status: result.fraud === 1 ? "PENDING" : "APPROVE"
         }
     )
     if(!orderCreated) throw new ApiError(StatusCodes.BAD_REQUEST,"Tao don hang that bai");
