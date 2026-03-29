@@ -57,7 +57,7 @@ console.log('hi')
 
 const signUp = async (req, res, next) => {
     try {
-        const result = await authService.signUp(req.email,req.password);
+        const result = await authService.signUp(req.body.email,req.body.password);
         return res.status(StatusCodes.CREATED).json(result);
     }
     catch (err) {
