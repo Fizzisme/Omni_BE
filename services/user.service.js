@@ -39,9 +39,29 @@ const update = async (user) => {
     return await userModel.update(user._id, data)
 }
 
+const getUserById = async (userId) => {
+    // Kiểm tra xem đã có tài khoản chưa
+    const userExisted = await userModel.findById(userId);
+    if (!userExisted) throw new ApiError(StatusCodes.NOT_FOUND, 'Không có tài khoản');
+
+
+    return {
+        _id: userExisted._id,
+        email: userExisted.authProviders[0].email,
+        role: userExisted.role,
+        createdAt: userExisted.createdAt,
+        address: userExisted?.address || "",
+        phoneNumber: userExisted?.phoneNumber || "",
+        age: userExisted?.age || "",
+        firstName: userExisted?.firstName || "",
+        lastName: userExisted?.lastName || "",
+        gender: userExisted?.gender || "",
+    };
+}
 
 
 export const userService = {
     getMyProfile,
     update,
+    getUserById
 }

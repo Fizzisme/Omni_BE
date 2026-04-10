@@ -19,8 +19,18 @@ const update = async (req, res, next) => {
     }
 }
 
+const getUserById = async (req, res, next) => {
+    try {
+        const result = await userService.getUserById(req.params.id);
+        res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+        next(err);
+    }
+}
+
 
 export const userController = {
     getMyProfile,
     update,
+    getUserById
 }
